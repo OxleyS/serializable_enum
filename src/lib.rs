@@ -129,31 +129,31 @@ macro_rules! serde_visitor {
 macro_rules! serializable_enum {
     // pub enum
     {
-        $(#[$enum_meta:meta])+
+        $(#[$enum_meta:meta])*
         pub enum $name:ident {
-            $($(#[$enum_variant_comment:meta])+ $variant:ident),+
+            $($(#[$enum_variant_comment:meta])* $variant:ident),+
             $(,)*
         }
         $visitor:ident
     } => {
-        $(#[$enum_meta])+
+        $(#[$enum_meta])*
         pub enum $name {
-            $($(#[$enum_variant_comment])+ $variant,)+
+            $($(#[$enum_variant_comment])* $variant,)+
         }
         serde_visitor!($name, $visitor, $($variant),+);
     };
     // no pub
     {
-        $(#[$enum_meta:meta])+
+        $(#[$enum_meta:meta])*
         enum $name:ident {
-            $($(#[$enum_variant_comment:meta])+ $variant:ident),+
+            $($(#[$enum_variant_comment:meta])* $variant:ident),+
             $(,)*
         }
         $visitor:ident
     } => {
-        $(#[$enum_meta])+
+        $(#[$enum_meta])*
         enum $name {
-            $($(#[$enum_variant_comment])+ $variant,)+
+            $($(#[$enum_variant_comment])* $variant,)+
         }
         serde_visitor!($name, $visitor, $($variant),+);
     };

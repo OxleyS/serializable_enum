@@ -92,6 +92,22 @@ impl_as_ref_from_str! {
     Error::Parse
 }
 
+// no comments
+serializable_enum! {
+    enum NoCommentContentFormat {
+        Markdown,
+        Html
+    }
+    NoCommentContentFormatVisitor
+}
+impl_as_ref_from_str! {
+    NoCommentContentFormat {
+        Markdown => "markdown",
+        Html => "html",
+    }
+    Error::Parse
+}
+
 #[test]
 fn test_pub_serialization() {
     let md = ContentFormat::Markdown;
