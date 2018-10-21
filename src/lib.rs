@@ -159,6 +159,88 @@ macro_rules! serializable_enum {
     };
 }
 
+/// Like serializable_enum, but with default implementations for AsRef and FromStr.
+/// 
+/// Takes an additional parse error type argument that gets passed to `impl_as_ref_from_str!`
+/// 
+/// # Example
+/// 
+/// ```
+/// // your error type
+/// #[derive(Debug)]
+/// pub enum Error {
+///     Parse(String),
+/// }
+/// 
+/// // You will need display implemented (you should already have this).
+/// impl ::std::fmt::Display for Error {
+///    fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
+///        write!(f, "{:?}", self)
+///    }
+/// }
+/// 
+/// serializable_enum! {
+///     #[derive(Debug, PartialEq)]
+///     pub enum Color {
+///         Red,
+///         Blue,
+///         Green,
+///     }
+///     ColorVistor,
+///     Error::Parse
+/// }
+/// 
+/// let c = Color::Red;
+/// assert_eq!(serde_json::to_string(&c).unwrap(), "\"Red\"")
+/// ```
+#[macro_export]
+macro_rules! serializable_enum_defaultstr {
+    // pub enum
+    {
+        $(#[$enum_meta:meta])*
+        pub enum $name:ident {
+            $($(#[$enum_variant_comment:meta])* $variant:ident),+
+            $(,)*
+        }
+        $visitor:ident
+        $err:ident::$err_variant:ident
+    } => {
+        $(#[$enum_meta])*
+        pub enum $name {
+            $($(#[$enum_variant_comment])* $variant,)+
+        }
+        serde_visitor!($name, $visitor, $($variant),+);
+        impl_as_ref_from_str! {
+            $name {
+                $($variant => stringify!($variant),)+
+            }
+            $err::$err_variant
+        }
+    };
+    // no pub
+    {
+        $(#[$enum_meta:meta])*
+        enum $name:ident {
+            $($(#[$enum_variant_comment:meta])* $variant:ident),+
+            $(,)*
+        }
+        $visitor:ident
+        $err:ident::$err_variant:ident
+    } => {
+        $(#[$enum_meta])*
+        enum $name {
+            $($(#[$enum_variant_comment])* $variant,)+
+        }
+        serde_visitor!($name, $visitor, $($variant),+);
+        impl_as_ref_from_str! {
+            $name {
+                $($variant => stringify!($variant),)+
+            }
+            $err::$err_variant
+        }
+    };
+}
+
 /// Generate `AsRef` and `FromStr` impls for the given type with the variant / string pairs
 /// specified.
 ///

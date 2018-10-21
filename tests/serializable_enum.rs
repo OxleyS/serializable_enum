@@ -108,6 +108,19 @@ impl_as_ref_from_str! {
     Error::Parse
 }
 
+// with default serialization
+serializable_enum_defaultstr! {
+    #[derive(Debug, PartialEq)]
+    enum DefaultStrContentFormat {
+        /// Markdown
+        Markdown,
+        /// HTML no comma
+        Html
+    }
+    DefaultStrContentFormatVisitor
+    Error::Parse
+}
+
 #[test]
 fn test_pub_serialization() {
     let md = ContentFormat::Markdown;
@@ -123,6 +136,15 @@ fn test_priv_serialization() {
     assert_eq!(serde_json::to_string(&md).unwrap(), "\"markdown\"");
 
     let des_md: PrivContentFormat = serde_json::from_str("\"markdown\"").unwrap();
+    assert_eq!(md, des_md);
+}
+
+#[test]
+fn test_default_serialization() {
+    let md = DefaultStrContentFormat::Markdown;
+    assert_eq!(serde_json::to_string(&md).unwrap(), "\"Markdown\"");
+
+    let des_md: DefaultStrContentFormat = serde_json::from_str("\"Markdown\"").unwrap();
     assert_eq!(md, des_md);
 }
 
